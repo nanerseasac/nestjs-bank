@@ -26,6 +26,20 @@ export class PrismaUserRepository implements UserRepository {
           },
         });
       }
+
+    async editing(id: number, name: string, email: string, password: string): Promise<any> {
+
+        
+        return this.prisma.user.update({
+            where: {
+                id: id
+            },data: {
+                name,
+                email,
+                password
+            }
+        })
+    }
     
 
 } 

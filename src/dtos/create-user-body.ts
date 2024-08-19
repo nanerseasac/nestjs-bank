@@ -4,7 +4,7 @@ export class createUserBody {
     @IsNotEmpty()
     @Length(5, 50)
     name: string;
-
+    
     @IsEmail()
     email: string;
     
