@@ -22,7 +22,7 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(VerifyUserAccMiddleware).forRoutes(
       'user',
-      'category',
+      'categories',
       'transaction',
       'transaction/statement'
     )

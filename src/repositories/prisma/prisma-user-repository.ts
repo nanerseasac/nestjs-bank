@@ -40,6 +40,29 @@ export class PrismaUserRepository implements UserRepository {
             }
         })
     }
+
+    async selectCategories(): Promise<any> {
+        return await this.prisma.category.findMany();
+    }
+
+    
+
+    async transactionAdd(descricao: string, valor: number, data: Date, tipo: string, usuarioId: number, categoriaId: number): Promise<any> {
+    return await this.prisma.transaction.create({
+        data: {
+            descricao,
+            valor,
+            data,
+            tipo,
+            usuario: {
+                connect: { id: usuarioId }
+            },
+            categoria: {
+                connect: { id: categoriaId }
+            }
+        }
+    })
+}
     
 
 } 
