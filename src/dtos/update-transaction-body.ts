@@ -2,7 +2,7 @@ import { IsIn, IsDateString, IsNotEmpty, IsNumber, IsPositive, Length, Max, Min 
 
 export type entradaOrSaida = 'entrada' | 'saida';
 
-export class createTransactionBody {
+export class updateTransactionBody {
     @Length(5,20)
     @IsNotEmpty()
     descricao: string
@@ -20,13 +20,10 @@ export class createTransactionBody {
     @IsNotEmpty()
     data: Date
 
-
     @IsNumber()
     @Min(1)
     @Max(17)
     @IsNotEmpty()
     categoriaId: number
-
-
 
 }

@@ -1,11 +1,12 @@
 
-import { Body, Controller, Get, Post, Put, Req, UnauthorizedException  } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Req, UnauthorizedException  } from '@nestjs/common';
 import { createUserBody } from './dtos/create-user-body';
 import { UserRepository } from './repositories/user-repositories';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { jwtPw } from './config/jwtpw';
 import { createTransactionBody } from './dtos/create-transaction-body';
+import { updateTransactionBody } from './dtos/update-transaction-body';
 
 
 @Controller()
@@ -102,11 +103,71 @@ export class AppController {
         .userRepository
         .transactionAdd(descricao, valor, data, tipo, id, categoriaId)
 
+        
+
         return newTransaction
 
       } catch (error) {
         console.log(error)
-        throw new Error('Failed to idk');
+        throw new Error('Failed to create transcation');
       }
     }
+
+    @Get('transaction')
+      async getTransactions(@Req() req: Request) {
+        const { id } = req['usuario']
+
+        try {
+        const transactions = await this.userRepository.findManyById(id)
+
+        
+
+        return transactions
+        } catch (error) {
+          console.log(error)
+          throw new Error('Failed to find transcation');
+        }
+      }
+
+      @Put('transaction/:id')
+  async updateTransaction(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Body() body: updateTransactionBody,
+  ) {
+    const { usuario_id } = req['usuario'];
+    const { descricao, valor, data, tipo, categoriaId } = body;
+
+    try {
+      const transactions = await this.userRepository.findManyById(parseInt(id, 10));
+      
+      if (!transactions) {
+        return { 
+          statusCode: 404, 
+          message: "Transaction not found, please ensure that you insert the right id" 
+        };
+      }
+
+  
+      const updateTransaction = await this.userRepository.transactionEdit(
+        parseInt(id, 10),
+        descricao,
+        valor,
+        data,
+        tipo,
+        categoriaId
+      );
+
+      return {
+        statusCode: 201,
+        message: "Transaction updated successfully",
+        data: updateTransaction,
+      };
+    } catch (error) {
+      console.error('Failed to update transaction', error);
+      throw new Error('Internal Error');
+    }
+  }
 }
+
+

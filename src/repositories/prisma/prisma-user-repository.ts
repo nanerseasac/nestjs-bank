@@ -62,7 +62,58 @@ export class PrismaUserRepository implements UserRepository {
             }
         }
     })
-}
     
+}
 
-} 
+async transactionEdit(
+    id: number,
+    descricao: string,
+    valor: number,
+    data: Date,
+    tipo: string,
+    categoriaId: number
+  ): Promise<any> {
+    return await this.prisma.transaction.update({
+      where: {
+        id: id,
+      },
+      data: {
+        descricao,
+        valor,
+        data,
+        tipo,
+        categoria: {
+          connect: {
+            id: categoriaId, // Certifique-se de que categoriaId não é undefined
+          },
+        },
+      },
+    });
+  }
+
+async findById(id: number): Promise<any> {
+    await this.prisma.category.findUnique({
+        where: {
+            id
+        }
+    })
+}
+
+async findTransactionById(id: number): Promise<any> {
+    await this.prisma.transaction.findUnique({
+        where: {
+            id
+        }
+    })
+}
+
+
+async findManyById(userId: number): Promise<any> {
+    return await this.prisma.transaction.findMany({
+        where: {
+            usuario_id: userId
+        }
+    })
+}
+
+}

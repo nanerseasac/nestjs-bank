@@ -4,6 +4,7 @@ import { PrismaService } from './database/prisma.service';
 import { UserRepository } from './repositories/user-repositories';
 import { PrismaUserRepository } from './repositories/prisma/prisma-user-repository';
 import { VerifyUserAccMiddleware } from './middleware/authenticator';
+import { ValidateTransaction } from './middleware/validate-transaction';
 // import { AppService } from './app.service';
 
 
@@ -24,7 +25,9 @@ export class AppModule {
       'user',
       'categories',
       'transaction',
+      'transaction/:id',
       'transaction/statement'
-    )
+    ),
+    consumer.apply(ValidateTransaction).forRoutes('transaction')
   }
 }

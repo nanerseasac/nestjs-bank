@@ -1,5 +1,7 @@
 import { IsEmail, IsNotEmpty, Length } from "class-validator";
 
+
+
 export class createUserBody {
     @IsNotEmpty()
     @Length(5, 50)
