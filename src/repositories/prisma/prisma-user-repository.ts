@@ -84,7 +84,7 @@ async transactionEdit(
         tipo,
         categoria: {
           connect: {
-            id: categoriaId, // Certifique-se de que categoriaId não é undefined
+            id: categoriaId,
           },
         },
       },
@@ -100,7 +100,7 @@ async findById(id: number): Promise<any> {
 }
 
 async findTransactionById(id: number): Promise<any> {
-    await this.prisma.transaction.findUnique({
+    return await this.prisma.transaction.findUnique({
         where: {
             id
         }
@@ -108,10 +108,19 @@ async findTransactionById(id: number): Promise<any> {
 }
 
 
+
 async findManyById(userId: number): Promise<any> {
     return await this.prisma.transaction.findMany({
         where: {
             usuario_id: userId
+        }
+    })
+}
+
+async deleteTransaction(id: number): Promise<void> {
+    await this.prisma.transaction.delete({
+        where: {
+            id: id
         }
     })
 }

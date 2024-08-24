@@ -1,5 +1,5 @@
 
-import { Body, Controller, Get, Param, Post, Put, Req, UnauthorizedException  } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UnauthorizedException  } from '@nestjs/common';
 import { createUserBody } from './dtos/create-user-body';
 import { UserRepository } from './repositories/user-repositories';
 import * as bcrypt from 'bcrypt';
@@ -7,6 +7,7 @@ import * as jwt from 'jsonwebtoken';
 import { jwtPw } from './config/jwtpw';
 import { createTransactionBody } from './dtos/create-transaction-body';
 import { updateTransactionBody } from './dtos/update-transaction-body';
+import { get } from 'http';
 
 
 @Controller()
@@ -130,44 +131,124 @@ export class AppController {
       }
 
       @Put('transaction/:id')
-  async updateTransaction(
-    @Param('id') id: string,
-    @Req() req: Request,
-    @Body() body: updateTransactionBody,
-  ) {
-    const { usuario_id } = req['usuario'];
-    const { descricao, valor, data, tipo, categoriaId } = body;
+        async updateTransaction(
+        @Param('id') id: string,
+      @Body() body: updateTransactionBody,
+      ) {
+        const { descricao, valor, data, tipo, categoriaId } = body;
 
-    try {
-      const transactions = await this.userRepository.findManyById(parseInt(id, 10));
+        try {
+          const transactions = await this.userRepository.findManyById(parseInt(id, 10));
       
-      if (!transactions) {
-        return { 
-          statusCode: 404, 
-          message: "Transaction not found, please ensure that you insert the right id" 
-        };
-      }
+          if (!transactions) {
+            return { 
+              statusCode: 404, 
+              message: "Transaction not found, please ensure that you insert the right id" 
+            };
+          }
 
   
-      const updateTransaction = await this.userRepository.transactionEdit(
-        parseInt(id, 10),
-        descricao,
-        valor,
-        data,
-        tipo,
-        categoriaId
-      );
+          const updateTransaction = await this.userRepository.transactionEdit(
+            parseInt(id, 10),
+            descricao,
+            valor,
+            data,
+            tipo,
+            categoriaId
+          );
 
+          return {
+            statusCode: 201,
+            message: "Transaction updated successfully",
+            data: updateTransaction,
+          };
+        } catch (error) {
+          console.error('Failed to update transaction', error);
+          throw new Error('Internal Error');
+        }
+  }
+  @Delete('transaction/:id')
+  async deleteTransaction(@Param('id') id: string) {
+    try {
+  
+      const transactionId = parseInt(id, 10);
+  
+      
+      const transaction = await this.userRepository.findTransactionById(transactionId);
+      console.log('Transações encontradas:', transaction);
+  
+   
+      if (!transaction) {
+        return {
+          statusCode: 404,
+          message: "Transaction not found, please ensure that you insert the right id"
+        };
+      }
+  
+      await this.userRepository.deleteTransaction(transactionId);
+  
       return {
-        statusCode: 201,
-        message: "Transaction updated successfully",
-        data: updateTransaction,
+        statusCode: 200,
+        message: "Transaction deleted successfully"
       };
     } catch (error) {
-      console.error('Failed to update transaction', error);
+      console.error('Erro ao deletar a transação:', error);
       throw new Error('Internal Error');
     }
   }
-}
+
+  @Get('transaction/:id')
+  async getTransaction(@Param('id') id: string) {
+    try {
+      const transaction = await this.userRepository.findTransactionById(parseInt(id, 10))
+
+      if(transaction) {
+        return transaction
+      }
+
+      return { message: 'Transaction not found'}
+    } catch (error) {
+      
+
+      throw new Error('Internal Error');
+    }
+  }
+
+  @Get('transactions/statement')
+  async getStatement(@Req() req: Request) {
+    const { id } = req['usuario']
+    try {
+      const transactions = await this.userRepository.findManyById(id)
+
+      console.log(transactions)
+
+      if(transactions.length < 1) {
+        return { message: 'Transactions not found'}
+      }
+
+      let totalInput: number = 0;
+      let totalOutput: number = 0; 
+
+      for(let i = 0; i < transactions.length; i++) {
+        if(transactions[i].tipo === 'entrada') {
+          totalInput += transactions[i].valor
+        }
+        else {
+          totalOutput += transactions[i].valor
+        }
+      }
+
+      return { entrada: totalInput, saida: totalOutput}
+    } catch (error) {
+      console.log(error)
+      throw new Error('Internal Error');
+
+    }
+
+    
+  }
+
+  }
+
 
 

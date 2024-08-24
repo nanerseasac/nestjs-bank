@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { PrismaService } from './database/prisma.service';
 import { UserRepository } from './repositories/user-repositories';
@@ -6,6 +6,7 @@ import { PrismaUserRepository } from './repositories/prisma/prisma-user-reposito
 import { VerifyUserAccMiddleware } from './middleware/authenticator';
 import { ValidateTransaction } from './middleware/validate-transaction';
 // import { AppService } from './app.service';
+
 
 
 
@@ -24,9 +25,8 @@ export class AppModule {
     consumer.apply(VerifyUserAccMiddleware).forRoutes(
       'user',
       'categories',
-      'transaction',
-      'transaction/:id',
-      'transaction/statement'
+      'transactions/statement',
+      { path: 'transaction*', method: RequestMethod.ALL }
     ),
     consumer.apply(ValidateTransaction).forRoutes('transaction')
   }

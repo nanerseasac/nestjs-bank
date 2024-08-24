@@ -8,5 +8,6 @@ export abstract class UserRepository {
     abstract selectCategories(): Promise<any>
     abstract transactionAdd(descricao: string, valor: number, data: Date, tipo: string, usuarioId: number, categoriaId: number): Promise<any>
     abstract transactionEdit(id: number,descricao: string, valor: number, data: Date, tipo: string, categoriaId: number): Promise<any>
+    abstract deleteTransaction(id: number): Promise<void>
 }
 
