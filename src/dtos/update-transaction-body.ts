@@ -1,29 +1,36 @@
-import { IsIn, IsDateString, IsNotEmpty, IsNumber, IsPositive, Length, Max, Min } from "class-validator";
+import {
+  IsIn,
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  Length,
+  Max,
+  Min,
+} from 'class-validator';
 
 export type entradaOrSaida = 'entrada' | 'saida';
 
 export class updateTransactionBody {
-    @Length(5,20)
-    @IsNotEmpty()
-    descricao: string
+  @Length(5, 20)
+  @IsNotEmpty()
+  descricao: string;
 
-    @IsPositive()
-    @IsNumber()
-    @IsNotEmpty()
-    valor: number
+  @IsPositive()
+  @IsNumber()
+  @IsNotEmpty()
+  valor: number;
 
-    @IsIn(['entrada', 'saida'])
-    tipo: entradaOrSaida
+  @IsIn(['entrada', 'saida'])
+  tipo: entradaOrSaida;
 
+  @IsDateString()
+  @IsNotEmpty()
+  data: Date;
 
-    @IsDateString()
-    @IsNotEmpty()
-    data: Date
-
-    @IsNumber()
-    @Min(1)
-    @Max(17)
-    @IsNotEmpty()
-    categoriaId: number
-
+  @IsNumber()
+  @Min(1)
+  @Max(17)
+  @IsNotEmpty()
+  categoriaId: number;
 }

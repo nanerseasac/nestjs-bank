@@ -7,27 +7,25 @@ import { VerifyUserAccMiddleware } from './middleware/authenticator';
 import { ValidateTransaction } from './middleware/validate-transaction';
 // import { AppService } from './app.service';
 
-
-
-
 @Module({
   imports: [],
   controllers: [AppController],
-  providers: [PrismaService,
+  providers: [
+    PrismaService,
     {
       provide: UserRepository,
-      useClass: PrismaUserRepository
-    }
+      useClass: PrismaUserRepository,
+    },
   ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(VerifyUserAccMiddleware).forRoutes(
-      'user',
-      'categories',
-      'transactions/statement',
-      { path: 'transaction*', method: RequestMethod.ALL }
-    ),
-    consumer.apply(ValidateTransaction).forRoutes('transaction')
+    consumer
+      .apply(VerifyUserAccMiddleware)
+      .forRoutes('user', 'categories', {
+        path: 'transaction*',
+        method: RequestMethod.ALL,
+      }),
+      consumer.apply(ValidateTransaction).forRoutes('transaction');
   }
 }

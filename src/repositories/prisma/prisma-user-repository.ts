@@ -1,78 +1,83 @@
-import { PrismaService } from "src/database/prisma.service";
-import { UserRepository } from "../user-repositories";
-import { Injectable } from "@nestjs/common";
-
+import { PrismaService } from 'src/database/prisma.service';
+import { Transaction, User, UserRepository } from '../user-repositories';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
-    constructor(private prisma: PrismaService) {
-         
-    }
+  constructor(private prisma: PrismaService) {}
 
-    async create(name: string, email: string, password: string): Promise<void> {
-        await this.prisma.user.create({
-            data: {
-                name,
-                email,
-                password
-            }
-        })
-    }
+  async create(name: string, email: string, password: string): Promise<void> {
+    await this.prisma.user.create({
+      data: {
+        name,
+        email,
+        password,
+      },
+    });
+  }
 
-    async findByEmail(email: string): Promise<any> {
-        return this.prisma.user.findUnique({
-          where: {
-            email,
-          },
-        });
-      }
+  async findByEmail(email: string): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
 
-    async editing(id: number, name: string, email: string, password: string): Promise<any> {
+  async editing(
+    id: number,
+    name: string,
+    email: string,
+    password: string,
+  ): Promise<User> {
+    return this.prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        name,
+        email,
+        password,
+      },
+    });
+  }
 
-        
-        return this.prisma.user.update({
-            where: {
-                id: id
-            },data: {
-                name,
-                email,
-                password
-            }
-        })
-    }
+  async selectCategories(): Promise<any> {
+    return await this.prisma.category.findMany();
+  }
 
-    async selectCategories(): Promise<any> {
-        return await this.prisma.category.findMany();
-    }
-
-    
-
-    async transactionAdd(descricao: string, valor: number, data: Date, tipo: string, usuarioId: number, categoriaId: number): Promise<any> {
+  async transactionAdd(
+    descricao: string,
+    valor: number,
+    data: Date,
+    tipo: string,
+    usuario_id: number,
+    categoria_id: number,
+  ): Promise<Transaction> {
     return await this.prisma.transaction.create({
-        data: {
-            descricao,
-            valor,
-            data,
-            tipo,
-            usuario: {
-                connect: { id: usuarioId }
-            },
-            categoria: {
-                connect: { id: categoriaId }
-            }
-        }
-    })
-    
-}
+      data: {
+        descricao,
+        valor,
+        data,
+        tipo,
+        usuario: {
+          connect: { id: usuario_id },
+        },
+        categoria: {
+          connect: { id: categoria_id },
+        },
+      },
+    });
+  }
 
-async transactionEdit(
+  async transactionEdit(
     id: number,
     descricao: string,
     valor: number,
     data: Date,
     tipo: string,
-    categoriaId: number
-  ): Promise<any> {
+    categoriaId: number,
+  ): Promise<Transaction> {
     return await this.prisma.transaction.update({
       where: {
         id: id,
@@ -91,38 +96,35 @@ async transactionEdit(
     });
   }
 
-async findById(id: number): Promise<any> {
+  async findById(id: number): Promise<any> {
     await this.prisma.category.findUnique({
-        where: {
-            id
-        }
-    })
-}
+      where: {
+        id,
+      },
+    });
+  }
 
-async findTransactionById(id: number): Promise<any> {
+  async findTransactionById(id: number): Promise<Transaction> {
     return await this.prisma.transaction.findUnique({
-        where: {
-            id
-        }
-    })
-}
+      where: {
+        id,
+      },
+    });
+  }
 
-
-
-async findManyById(userId: number): Promise<any> {
+  async findManyById(userId: number): Promise<Transaction[]> {
     return await this.prisma.transaction.findMany({
-        where: {
-            usuario_id: userId
-        }
-    })
-}
+      where: {
+        usuario_id: userId,
+      },
+    });
+  }
 
-async deleteTransaction(id: number): Promise<void> {
+  async deleteTransaction(id: number): Promise<void> {
     await this.prisma.transaction.delete({
-        where: {
-            id: id
-        }
-    })
-}
-
+      where: {
+        id: id,
+      },
+    });
+  }
 }
